@@ -1,0 +1,69 @@
+DT-1:
+    Image
+
+DT-2: Is the tree a 100% accurate model of your data? If not, why not? And what are the consequences?
+    The resulting tree is not a perfect model of the data, 
+    3 samples; [yellow, small, round, no], [yellow, large, round, yes], [yellow, large, round, yes] are incorrectly classified.
+    This results in a model accuracy of (16-3)/16 = 0.81 which is still decent for such a small dataset.
+
+DT-3: What is pruning, and what is it used for?
+    Pruning is a method reduce the size of a tree by removing elements or parts the tree. 
+    The reduction of the size makes the tree less complex and increases the generalization.
+    pruning is mostly applied as a method against overfitting which increases the test score.
+
+DT-4: What parameters can you change in scikit that will affect the structure of a tree? What do they do?
+    - max_depth: the maximum allowed amount of steps in the tree's longest paths.
+	- min_samples_split: the minimum amount of instances that have to be in the node to allow the creation of child nodes.
+	- min_samples_leaf: the minimum amount of instances that have to be in a node to be a leafnode. 
+	- max_leaf_nodes: the maximum amount of leaf nodes in the tree.
+	- min_impurity_decrease: the minumum amount of decrease in impurity a split should obtain be to allowed.
+
+DT-5: By changing such parameters, do results change?
+    by setting the limiting parameter we reduce the comlexity of the tree.
+    This will effect in higher test scores because the tree is not perfectly fitting the training data.
+    This will yield a higher generalization for the model.
+
+KNN-1a: Is accuracy better with a lower or higher K?
+    The classification performance becomes relevant if K is higher than 15, so high K is better.
+
+KNN-1b: Does class performance change substantially with varying values of K?
+    Between 2 and 15 the performance is significantly increasing when K increases. 
+    After 15, K seem to reach convergence, it is fully converged at 31 or 50.
+
+KNN-1c: How does changing K affect the bias/variance trade off?
+    low k: high variance, low bias
+    high k: high bias, low variance
+
+Time comparison:
+    NB:     train: 0.3      test: 0.023 
+    DT:     train: 1.3      test: 0.024    
+    KNN:    train: 0.3      test: 0.8
+
+    The decision tree is the slowest learner because the whole tree has to be constructed.
+    At each node the information gain over all instances in that node has to be calculated which takes time.
+    For Naive bayes and KNN the model is the data itself so it only has to load the data into the model.
+    In the test phase the NB is the fastest predictor, this is because it only has to calculate the priors and posteriors over one instance.
+    The decision tree is also very fast because the time complexity is bound to the depth of the tree (longest path retrieval).
+    KNN is a very slow predictor, it has to calculate the distance for each instance to all other instances and retrieve the K closest instances to do a majority vote.
+    (for the nerds: O(1.5 * n^2)).
+
+Best model:
+    Before we started the model selection we pre-processed the dataset to reduce it's dimentionality by removing 
+    stopwords that occur in the english NLTK stopwords list. 
+    Next, we stemmed the words using the Porter stemmer to group word conjugations.
+    To obtain the best model we tried all 3 classifiers in a model selection grid search.
+    The search was performed on a 64 Core computing node using the Sklearn GridSearchCV class.
+    A 5 fold cross validation was chosen with full (sensible) parameter ranges for each classifier.
+    We only obtained the f1 micro averaging scores as performance indicator since
+    we concluded last week that the dataset has a decent performance balance over the 6 classes.  
+    This resulted in the following maximum scores; 
+    DT      :{'max_depth': 29, 'min_samples_split': 2, 'max_leaf_nodes': 57, 'min_samples_leaf': 4}:    0.81, 
+    KNN     :{'n_neighbors': 45, 'weights': 'distance'}:                                                0.85,
+    NB      :alpha:0.527 :                                                                              0.91,
+    
+    In the results we can observe a significant higher score for Naive Bayes compared to the other models.
+    Because of this we chose the NB classifier as the best model.
+    The Naive Bayes has only one parameter that can be tweaked which is smoothing parameter alpha.
+    To obtain the optimal alpha, we grid search between 0.1 and 1.0 with steps of 0.01 with f1 macro- and micro averaging scores.
+    This resulted in an optimal alpha of 0.53 for both scores.
+
