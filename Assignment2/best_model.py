@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -9,11 +10,13 @@ from sklearn.model_selection import GridSearchCV
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 
-# know training set
-TRAINING_SET_FILENAME = "trainset.txt"
 
-# blink test set
-TEST_SET_FILENAME = "trainset.txt"
+TRAINING_SET_FILENAME = sys.argv[1]
+TEST_SET_FILENAME = sys.argv[2]
+if not (TRAINING_SET_FILENAME or TEST_SET_FILENAME):
+    print("incorrect arguments")
+print(f"Training file: {TRAINING_SET_FILENAME}")
+print(f"Test file: {TEST_SET_FILENAME}")
 
 def read_corpus(corpus_file, use_sentiment):
     st = PorterStemmer()
@@ -45,11 +48,12 @@ def read_corpus(corpus_file, use_sentiment):
 def identity(x):
     return x
 
+print("Reading data")
 # read known training set
-X_train, Y_train = read_corpus(, use_sentiment=False)
+X_train, Y_train = read_corpus(TRAINING_SET_FILENAME, use_sentiment=False)
 
 # read blind test set
-X_test, Y_test = read_corpus('trainset.txt', use_sentiment=False)
+X_test, Y_test = read_corpus(TEST_SET_FILENAME, use_sentiment=False)
 
 # use TD-IDF vectors
 vec = TfidfVectorizer(preprocessor = identity, tokenizer = identity)
